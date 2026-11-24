@@ -605,8 +605,13 @@ public final class SpotifyProvider implements LyricsProvider {
             }
 
             try (InputStream is = connection.getInputStream()) {
-                byte[] responseBytes = is.readAllBytes();
-                return parseCanvasUrl(responseBytes);
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                byte[] temp = new byte[4096];
+                int read;
+                while ((read = is.read(temp)) != -1) {
+                    buffer.write(temp, 0, read);
+                }
+                return parseCanvasUrl(buffer.toByteArray());
             }
         } catch (Exception ex) {
             Logger.printDebug(() -> "Could not fetch Spotify canvas", ex);
